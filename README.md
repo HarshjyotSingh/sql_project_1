@@ -130,21 +130,11 @@ ORDER BY 1
 
 7. **Write a SQL query to calculate the average sale for each month. Find out best selling month in each year**:
 ```sql
-SELECT 
-       year,
-       month,
-    avg_sale
-FROM 
-(    
-SELECT 
-    EXTRACT(YEAR FROM sale_date) as year,
-    EXTRACT(MONTH FROM sale_date) as month,
-    AVG(total_sale) as avg_sale,
-    RANK() OVER(PARTITION BY EXTRACT(YEAR FROM sale_date) ORDER BY AVG(total_sale) DESC) as rank
+SELECT EXTRACT(YEAR FROM sale_date) as year,EXTRACT(MONTH FROM sale_date) as month  ,ROUND(AVG(total_sale::numeric),1) as avg_sale
 FROM retail_sales
-GROUP BY 1, 2
-) as t1
-WHERE rank = 1
+GROUP BY 1,2
+ORDER BY 3 desc
+limit 2
 ```
 
 8. **Write a SQL query to find the top 5 customers based on the highest total sales **:
@@ -169,22 +159,15 @@ GROUP BY category
 
 10. **Write a SQL query to create each shift and number of orders (Example Morning <12, Afternoon Between 12 & 17, Evening >17)**:
 ```sql
-WITH hourly_sale
-AS
-(
-SELECT *,
-    CASE
-        WHEN EXTRACT(HOUR FROM sale_time) < 12 THEN 'Morning'
-        WHEN EXTRACT(HOUR FROM sale_time) BETWEEN 12 AND 17 THEN 'Afternoon'
-        ELSE 'Evening'
-    END as shift
+SELECT CASE
+            WHEN EXTRACT(HOUR FROM sale_time)<12 THEN 'Morning'
+            WHEN EXTRACT(HOUR FROM sale_time) Between 12 and 17 THEN 'Afternoon'
+            ELSE 'Evening'
+            END
+as Shift_work,count(*) AS ORDERS
 FROM retail_sales
-)
-SELECT 
-    shift,
-    COUNT(*) as total_orders    
-FROM hourly_sale
-GROUP BY shift
+GROUP BY
+   1
 ```
 
 ## Findings
@@ -225,3 +208,4 @@ For more content on SQL, data analysis, and other data-related topics, make sure
 - **Discord**: [Join our community to learn and grow together](https://discord.gg/36h5f2Z5PK)
 
 Thank you for your support, and I look forward to connecting with you!
+
